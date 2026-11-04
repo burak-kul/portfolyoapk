@@ -1,0 +1,68 @@
+{
+  "landing": {
+    "firstName": "Burak",
+    "lastName": "Kül",
+    "statement": "Exploring What Lies Beyond",
+    "sideNote": "A field study in\nform, motion & digital matter.",
+    "latestCardLabel": "Latest note",
+    "noNoteText": "No note published yet.",
+    "tableKicker": "Latest notes"
+  },
+  "work": {
+    "kicker": "Project index / 00",
+    "titleMain": "Work",
+    "titleAccent": "in orbit",
+    "intro": "A growing index of objects, systems and experiments.",
+    "emptyText": "No projects published yet.",
+    "projects": []
+  },
+  "notes": {
+    "kicker": "Field notes / 00",
+    "titleMain": "Notes",
+    "titleAccent": "for later",
+    "intro": "A place for ideas, questions and things worth returning to.",
+    "categories": [
+      "Mathematics",
+      "Space & Astronomy",
+      "Engineering",
+      "Philosophy & Politics",
+      "Chemistry",
+      "Physics"
+    ],
+    "items": []
+  },
+  "about": {
+    "kicker": "About / 00",
+    "titleMain": "About",
+    "titleAccent": "me",
+    "intro": "Engineering, space and everything in between. I build things, ask questions and keep notes on what I find.",
+    "body": "Hello, I'm Burak Kül, a Turkish student with big dreams and a huge curiosity about space and engineering. However, my interests aren't limited to these two fields. I'm also passionate about mathematics, physics, chemistry, philosophy, and politics.\n\nI dream of becoming an aerospace engineer one day, and my ultimate goal in life is to establish my own space company.\n\nI've always been curious about how things work and how different systems operate. But about three years ago, my curiosity about space began to outweigh all my other interests.\n\nI believe a new era of space exploration is approaching, and I want to be part of it — not just as an engineer, but as someone who helps lead the way towards the exploration of space and the advancement of humanity.",
+    "interests": [
+      "Engineering",
+      "Space & Astronomy",
+      "Mathematics",
+      "Physics",
+      "Chemistry",
+      "Philosophy & Politics"
+    ]
+  },
+  "contact": {
+    "kicker": "Contact / 00",
+    "titleMain": "Get in",
+    "titleAccent": "touch",
+    "intro": "Have an idea, a project or just a question? Write to me and let's take a look together.",
+    "text": "You can reach me through the links below.",
+    "links": [
+      {
+        "label": "Email",
+        "value": "burakkl@protonmail.com",
+        "href": "mailto:burakkl@protonmail.com"
+      },
+      {
+        "label": "GitHub",
+        "value": "github.com/burak-kul",
+        "href": "https://github.com/burak-kul"
+      }
+    ]
+  }
+}

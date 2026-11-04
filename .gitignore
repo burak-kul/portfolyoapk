@@ -1,0 +1,10 @@
+node_modules
+dist
+mobile-admin/dist
+mobile-admin/src-tauri/target
+mobile-admin/src-tauri/gen
+*.log
+# secrets
+server/data/admin-password.txt
+server/data/admin-hash.json
+server/data/auth.json

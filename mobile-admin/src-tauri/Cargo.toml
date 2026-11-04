@@ -1,0 +1,19 @@
+[package]
+name = "burak-kul-admin"
+version = "0.1.0"
+description = "Burak Kül Portfolio Mobile Command Center"
+authors = ["Burak Kül"]
+edition = "2021"
+
+[lib]
+name = "burak_kul_admin_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+

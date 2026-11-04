@@ -1,0 +1,47 @@
+{
+  "landing": {
+    "firstName": "Burak",
+    "lastName": "Kül",
+    "statement": "Exploring What Lies Beyond",
+    "sideNote": "A field study in\nform, motion & digital matter.",
+    "latestCardLabel": "Latest note",
+    "noNoteText": "No note published yet.",
+    "tableKicker": "Latest notes"
+  },
+  "work": {
+    "kicker": "Project index / 00",
+    "titleMain": "Work",
+    "titleAccent": "in orbit",
+    "intro": "A growing index of objects, systems and experiments.",
+    "emptyText": "No projects published yet.",
+    "projects": []
+  },
+  "notes": {
+    "kicker": "Field notes / 00",
+    "titleMain": "Notes",
+    "titleAccent": "for later",
+    "intro": "A place for ideas, questions and things worth returning to.",
+    "categories": ["Mathematics", "Space & Astronomy", "Engineering", "Philosophy & Politics", "Chemistry", "Physics"],
+    "items": []
+  },
+  "about": {
+    "kicker": "About / 00",
+    "titleMain": "About",
+    "titleAccent": "me",
+    "intro": "Engineering, space and everything in between. I build things, ask questions and keep notes on what I find.",
+    "body": "Write your story here: who you are, what you study or build, and what excites you.",
+    "interests": ["Engineering", "Space & Astronomy", "Mathematics", "Physics", "Chemistry", "Philosophy & Politics"]
+  },
+  "contact": {
+    "kicker": "Contact / 00",
+    "titleMain": "Get in",
+    "titleAccent": "touch",
+    "intro": "Have an idea, a project or just a question? Write to me and let's take a look together.",
+    "text": "You can reach me through the links below.",
+    "links": [
+      { "label": "Email", "value": "burakkl@protonmail.com", "href": "mailto:burakkl@protonmail.com" },
+      { "label": "GitHub", "value": "github.com/burak-kul", "href": "https://github.com/burak-kul" }
+    ]
+  }
+}
+
