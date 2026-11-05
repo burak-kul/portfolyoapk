@@ -454,6 +454,9 @@ a:focus-visible, button:focus-visible, .cms-button:focus-within, summary:focus-v
 .cms, .cms-login { position: relative; isolation: isolate; overflow-x: hidden; }
 .cms-bg-motion { opacity: .42; z-index: 0; }
 .cms-side, .cms-main, .cms-login form { position: relative; z-index: 1; }
+.cms-toast { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px clamp(14px, 4vw, 56px); border-bottom: 2px solid #ffee00; background: rgba(255, 72, 0, .18); backdrop-filter: blur(8px); animation: page-enter .25s ease both; }
+.cms-toast b { display: block; color: #ffee00; font: 600 15px/1.2 'Syne', sans-serif; }
+.cms-toast span { display: block; margin-top: 3px; color: #f2f0e9; font: 400 12px/1.4 'DM Mono', monospace; overflow-wrap: anywhere; }
 @media (max-width: 860px) {
   .cms-side nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); }
   .cms-side nav button { padding: 12px 10px; font-size: 14px; border-top: 1px solid #242424 !important; border-left: 1px solid #242424 !important; }

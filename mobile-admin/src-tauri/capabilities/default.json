@@ -3,6 +3,6 @@
   "identifier": "default",
   "description": "Default capabilities for Burak Kül Admin",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": ["core:default", "notification:default"]
 }
 

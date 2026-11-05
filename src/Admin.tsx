@@ -451,7 +451,17 @@ function InboxView({ onUnreadChange }: { onUnreadChange: (count: number) => void
   }, [])
 
   return (
-    <Card title={`Direct messages (${messages.length})`} actions={<button type="button" className="cms-button is-ghost" onClick={load}>Refresh</button>}>
+    <Card
+      title={`Direct messages (${messages.length})`}
+      actions={
+        <div className="cms-item-actions">
+          <button type="button" className="cms-button is-ghost" onClick={() => triggerNativeNotification('Test Transmission', 'Burak Kül Admin notifications are active!')}>
+            Test alert
+          </button>
+          <button type="button" className="cms-button is-ghost" onClick={load}>Refresh</button>
+        </div>
+      }
+    >
       {error && <p className="cms-error">{error}</p>}
       {messages.length === 0 && <p className="cms-muted">Inbox is empty. Visitors can send messages from the Contact page.</p>}
       {messages.map((msg) => (
@@ -632,6 +642,77 @@ function Login({ isMobileApp, onDone }: { isMobileApp?: boolean; onDone: () => v
   )
 }
 
+type TauriInternals = { invoke?: (cmd: string, args?: Record<string, unknown>) => Promise<unknown> }
+
+function playAlertTone() {
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    if (!Ctx) return
+    const ctx = new Ctx()
+    const now = ctx.currentTime
+    for (const [freq, start, dur] of [[880, 0, 0.12], [1318.5, 0.14, 0.22]] as const) {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(freq, now + start)
+      gain.gain.setValueAtTime(0.18, now + start)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + start + dur)
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(now + start)
+      osc.stop(now + start + dur)
+    }
+  } catch {
+    // AudioContext blocked until interaction
+  }
+}
+
+async function requestNativeNotificationPermission() {
+  const tauri = (window as unknown as { __TAURI_INTERNALS__?: TauriInternals }).__TAURI_INTERNALS__
+  if (tauri?.invoke) {
+    try {
+      const perm = await tauri.invoke('plugin:notification|is_permission_granted')
+      if (!perm) await tauri.invoke('plugin:notification|request_permission')
+    } catch {
+      // ignore
+    }
+  }
+  if ('Notification' in window && Notification.permission === 'default') {
+    try { void Notification.requestPermission() } catch { /* ignore */ }
+  }
+}
+
+function triggerNativeNotification(title: string, body: string) {
+  playAlertTone()
+  const tauri = (window as unknown as { __TAURI_INTERNALS__?: TauriInternals }).__TAURI_INTERNALS__
+  if (tauri?.invoke) {
+    void requestNativeNotificationPermission().then(() => {
+      void tauri.invoke!('notify_new_message', { title, body }).catch(() => {
+        void tauri.invoke!('plugin:notification|notify', { options: { title, body } }).catch(() => {})
+      })
+    })
+  } else if ('Notification' in window && Notification.permission === 'granted') {
+    try { new Notification(title, { body }) } catch { /* ignore */ }
+  }
+}
+
+const NOTIFIED_STORAGE_KEY = 'bk_admin_notified_msgs'
+function getNotifiedIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(NOTIFIED_STORAGE_KEY)
+    return raw ? new Set(JSON.parse(raw) as string[]) : new Set()
+  } catch {
+    return new Set()
+  }
+}
+function saveNotifiedIds(ids: Set<string>) {
+  try {
+    localStorage.setItem(NOTIFIED_STORAGE_KEY, JSON.stringify([...ids].slice(-200)))
+  } catch {
+    // ignore
+  }
+}
+
 export function Admin({ content, onSaved, isMobileApp }: { content: Content; onSaved: (content: Content) => void; isMobileApp?: boolean }) {
   const [auth, setAuth] = useState<'loading' | 'out' | 'in'>('loading')
   const [saved, setSaved] = useState(content)
@@ -639,28 +720,26 @@ export function Admin({ content, onSaved, isMobileApp }: { content: Content; onS
   const [section, setSection] = useState<SectionKey | 'password'>('landing')
   const [status, setStatus] = useState('')
   const [unread, setUnread] = useState(0)
-  const knownMessageIds = useRef<Set<string> | null>(null)
+  const [toast, setToast] = useState<{ title: string; body: string } | null>(null)
   const dirty = JSON.stringify(saved) !== JSON.stringify(draft)
 
-  const checkMessagesAndNotify = ( requestPermission = false ) => {
-    if (requestPermission && 'Notification' in window && Notification.permission === 'default') {
-      void Notification.requestPermission()
-    }
+  const checkMessagesAndNotify = (requestPermission = false) => {
+    if (requestPermission) void requestNativeNotificationPermission()
     api.getMessages().then((res) => {
       setUnread(res.unreadCount)
-      const currentIds = new Set(res.messages.map((m) => m.id))
-      if (knownMessageIds.current) {
-        for (const msg of res.messages) {
-          if (!msg.read && !knownMessageIds.current.has(msg.id)) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification(`New message: ${msg.subject}`, {
-                body: `${msg.name} (${msg.email}): ${msg.body.slice(0, 100)}`,
-              })
-            }
-          }
+      const notified = getNotifiedIds()
+      let updated = false
+      for (const msg of res.messages) {
+        if (!msg.read && !notified.has(msg.id)) {
+          notified.add(msg.id)
+          updated = true
+          const title = `New message: ${msg.subject}`
+          const body = `${msg.name} (${msg.email}): ${msg.body.slice(0, 100)}`
+          setToast({ title, body })
+          triggerNativeNotification(title, body)
         }
       }
-      knownMessageIds.current = currentIds
+      if (updated) saveNotifiedIds(notified)
     }).catch(() => {})
   }
 
@@ -684,10 +763,10 @@ export function Admin({ content, onSaved, isMobileApp }: { content: Content; onS
     }).catch(() => setAuth('out'))
   }, [])
 
-  // Background polling for new direct messages (every 20s while signed in)
+  // Background polling for new direct messages (every 10s while signed in)
   useEffect(() => {
     if (auth !== 'in') return
-    const timer = window.setInterval(() => checkMessagesAndNotify(false), 20000)
+    const timer = window.setInterval(() => checkMessagesAndNotify(false), 10000)
     return () => window.clearInterval(timer)
   }, [auth])
 
@@ -774,6 +853,18 @@ export function Admin({ content, onSaved, isMobileApp }: { content: Content; onS
         </div>
       </aside>
       <section className="cms-main">
+        {toast && (
+          <div className="cms-toast" role="status">
+            <div onClick={() => { setSection('inbox'); setToast(null) }} style={{ cursor: 'pointer', flex: 1 }}>
+              <b>{toast.title}</b>
+              <span>{toast.body}</span>
+            </div>
+            <div className="cms-item-actions">
+              <button type="button" className="cms-button is-primary" onClick={() => { setSection('inbox'); setToast(null) }}>Open Inbox</button>
+              <button type="button" className="cms-button is-ghost" onClick={() => setToast(null)}>✕</button>
+            </div>
+          </div>
+        )}
         <header className="cms-bar">
           <div><p className="section-kicker">Editing</p><h1>{title}</h1></div>
           <div className="cms-bar-actions">
