@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOMAIN="${1:-_}"
+DOMAIN="${1:-burakkul.me www.burakkul.me _}"
 
 echo "=== [1/5] Sistem paketleri ve Node.js 22 kontrol ediliyor ==="
 if ! command -v node >/dev/null 2>&1 || [ "$(node -v | cut -d. -f1 | tr -d 'v')" -lt 20 ]; then
@@ -31,6 +31,7 @@ WorkingDirectory=$APP_DIR
 Environment=NODE_ENV=production
 Environment=PORT=3001
 Environment=HOST=0.0.0.0
+Environment=SITE_URL=https://burakkul.me
 ExecStart=$NODE_BIN $APP_DIR/server/index.mjs
 Restart=always
 RestartSec=3
@@ -81,11 +82,15 @@ PUBLIC_IP="$(curl -4 -fsSL ifconfig.me || hostname -I | awk '{print $1}')"
 echo ""
 echo "=========================================================="
 echo " KURULUM TAMAMLANDI!"
-echo " Web Siten:          http://$PUBLIC_IP"
-echo " Web Admin Paneli:   http://$PUBLIC_IP/admin"
-echo " Mobil APK URL'si:   http://$PUBLIC_IP"
+echo " Web Siten (IP):     http://$PUBLIC_IP"
+echo " Web Siten (Domain): http://burakkul.me"
+echo " Web Admin Paneli:   http://burakkul.me/admin"
+echo " Mobil APK URL'si:   https://burakkul.me (SSL sonrası)"
 if [ -f "$APP_DIR/server/data/admin-password.txt" ]; then
   echo " İlk Admin Şifren:   $(cat "$APP_DIR/server/data/admin-password.txt")"
 fi
+echo ""
+echo " Namecheap DNS (A Kaydı) yönlendikten sonra ÜCRETSİZ HTTPS (SSL) için:"
+echo " sudo apt install -y certbot python3-certbot-nginx && sudo certbot --nginx -d burakkul.me -d www.burakkul.me"
 echo "=========================================================="
 
