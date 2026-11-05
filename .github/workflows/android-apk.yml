@@ -31,11 +31,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install project dependencies
-        run: npm ci || npm install
-
-      - name: Install Tauri CLI v2 globally
-        run: npm install -g @tauri-apps/cli@^2.0.0
+      - name: Install project dependencies & Tauri CLI v2
+        run: |
+          npm ci || npm install
+          npm install --no-save @tauri-apps/cli@^2.0.0
+          ln -sf "$(pwd)/node_modules/@tauri-apps/cli/tauri.js" mobile-admin/src-tauri/tauri
 
       - name: Setup Java JDK 17
         uses: actions/setup-java@v4
@@ -72,13 +72,13 @@ jobs:
       - name: Initialize & Build Android APK
         working-directory: mobile-admin
         run: |
-          tauri android init --ci
-          tauri icon src-tauri/icons/icon.png
+          npm run tauri -- android init --ci
+          npm run tauri -- icon src-tauri/icons/icon.png
           MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
           if [ -f "$MANIFEST" ]; then
             sed -i 's/android:usesCleartextTraffic="\${usesCleartextTraffic}"/android:usesCleartextTraffic="true"/' "$MANIFEST"
           fi
-          tauri android build --apk --debug --target aarch64 --ci
+          npm run tauri -- android build --apk --debug --target aarch64 --ci
 
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
