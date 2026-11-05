@@ -73,9 +73,10 @@ jobs:
         working-directory: mobile-admin
         run: |
           tauri android init --ci
+          tauri icon src-tauri/icons/icon.png
           MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
           if [ -f "$MANIFEST" ]; then
-            sed -i 's/<application/<application android:usesCleartextTraffic="true"/' "$MANIFEST"
+            sed -i 's/android:usesCleartextTraffic="\${usesCleartextTraffic}"/android:usesCleartextTraffic="true"/' "$MANIFEST"
           fi
           tauri android build --apk --debug --target aarch64 --ci
 
